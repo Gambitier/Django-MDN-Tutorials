@@ -28,6 +28,14 @@ class Genre(models.Model):
         return self.name
 
 
+class Language(models.Model):
+    name = models.CharField(max_length=200,
+                            help_text="Enter a the book's natural language (e.g. English, French, Japanese etc.)")
+
+    def __str__(self):
+        return self.name
+
+
 class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey('Author', on_delete=models.SET_NULL, null=True)
@@ -39,22 +47,23 @@ class Book(models.Model):
                             help_text='13 Character <a href="https://www.isbn-international.org/content/what-isbn'
                                       '">ISBN number</a>')
 
-    genre = models.ManyToManyField(Genre, help_text='Select a genre for this book')
+    genres = models.ManyToManyField(Genre, help_text='Select a genre for this book')
 
     # ManyToManyField used because genre can contain many books. Books can cover many genres.
     # Genre class has already been defined so we can specify the object above.
 
     language = models.ForeignKey('Language', on_delete=models.SET_NULL, null=True)
 
+    def display_genre(self):
+        return ', '.join([genre.name for genre in self.genres.all()[:3]])
+
+    display_genre.short_description = 'Genre'
+
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse('book-detail', args=[str(self.id)])
-
-    def display_genre(self):
-        self.display_genre.short_description = 'Genre'
-        return ','.join(genre.name for genre in self.genre.all())
 
 
 class BookInstance(models.Model):
@@ -91,18 +100,8 @@ class Author(models.Model):
     class Meta:
         ordering = ["last_name", "first_name"]
 
-
     def get_absolute_url(self):
         return reverse('author-detail', args=[str(self.id)])
 
     def __str__(self):
         return '{0} {1}'.format(self.last_name, self.first_name)
-
-
-class Language(models.Model):
-
-    name = models.CharField(max_length=200,
-                            help_text="Enter a the book's natural language (e.g. English, French, Japanese etc.)")
-
-    def __str__(self):
-        return self.name
