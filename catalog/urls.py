@@ -5,8 +5,19 @@ from . import views
 app_name = 'catalog'
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
-    path('books/', views.BookView.as_view(), name='books'),
-    path('authors/', views.AuthorView.as_view(), name='authors'),
-    path('book/<str:id>/', views.BookDetailsView.as_view(), name="book details"),
-    path('author/<str:id>/', views.AuthorDetailsView.as_view(), name="author details"),
+    path('books/', views.BookListView.as_view(), name='books'),
+    path('authors/', views.AuthorListView.as_view(), name='authors'),
+    path('book/<int:pk>/', views.BookDetailsView.as_view(), name="book-details"),
+    path('author/<str:id>/', views.AuthorDetailsView.as_view(), name="author-details"),
 ]
+
+# =============================================================================================
+# Passing additional options in your URL maps:
+#
+# This approach can be useful if you want to use the same view for multiple resources, and pass data to configure its
+#  behaviour in each case (below we supply a different template in each case).
+# =============================================================================================
+
+# path('url/', views.my_reused_view, {'my_template_name': 'some_path'}, name='aurl'),
+# path('anotherurl/', views.my_reused_view, {'my_template_name': 'another_path'}, name='anotherurl'),
+

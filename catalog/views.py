@@ -3,7 +3,7 @@ from django.shortcuts import render
 from .models import *
 
 # Create your views here.
-from django.views import View
+from django.views import View, generic
 
 
 class IndexView(View):
@@ -29,29 +29,53 @@ class IndexView(View):
         return render(request, 'catalog/index.html', context)
 
 
-class BookView(View):
+class BookListView(generic.ListView):
+    model = Book
+    # =============================================================================== Within the template you can
+    # access the list of books with the template variable named object_list OR book_list (i.e. generically
+    # "the_model_name_list").
+    #  ===============================================================================
 
-    def get(self, request):
-        msg = "List of Books"
-        return HttpResponse(msg)
+    template_name = 'catalog/book_list.html'
+
+    # context_object_name = 'my_book_list'
+    # queryset = Book.objects.all()
+
+    # ==================================================================================
+    # we can override the  get_queryset() method to change the list of records returned. This is more flexible than
+    # just setting the queryset attribute
+    # ==================================================================================
+
+    def get_queryset(self):
+        # original qs
+        qs = super().get_queryset()
+        # filter by a variable captured from url, for example
+        return qs
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(BookListView, self).get_context_data(**kwargs)
+    #     return context
 
 
-class AuthorView(View):
+class AuthorListView(View):
 
     def get(self, request):
         msg = "List of Authors"
         return HttpResponse(msg)
 
 
-class BookDetailsView(View):
-
-    def get(self, request, id):
-        msg = "This is a page to show Book Details  Book: "
-        return HttpResponse(msg + "<br> <br/> Book:" + id)
+class BookDetailsView(generic.DetailView):
+    # ===============================================================================
+    # If a requested record does not exist then the generic class-based detail view will raise an Http404 exception
+    # for you automatically
+    # ===============================================================================
+    template_name = "catalog/book_detail.html"
+    model = BookInstance
+    # ===============================================================================
+    # Within the template you can access the list of books with the
+    # template variable named object OR book (i.e. generically "the_model_name").
+    # ===============================================================================
 
 
 class AuthorDetailsView(View):
-
-    def get(self, request, id):
-        msg = "This is a page to show Author Details"
-        return HttpResponse(msg + "<br/><br/>Author: " + id)
+    pass
