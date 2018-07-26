@@ -9,7 +9,14 @@ urlpatterns = [
     path('authors/', views.AuthorListView.as_view(), name='authors'),
     path('book/<int:pk>/', views.BookDetailsView.as_view(), name="book-details"),
     path('author/<int:pk>/', views.AuthorDetailsView.as_view(), name="author-details"),
+    path('mybooks/', views.LoanedBooksByUserListView.as_view(), name='my-borrowed'),
+    path('borrowed/', views.BorrowedListView.as_view(), name='borrowed'),
+
 ]
+
+
+
+
 
 # =============================================================================================
 # Passing additional options in your URL maps:

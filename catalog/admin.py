@@ -13,6 +13,13 @@ admin.site.register(Language)
 admin.site.register(Genre)
 
 
+class BooksInstanceInline(admin.TabularInline):
+    """
+    Defines format of inline book instance insertion (used in BookAdmin)
+    """
+    model = BookInstance
+
+
 class BooksInline(admin.TabularInline):
     """
     Defines format of inline book insertion (used in AuthorAdmin)
@@ -33,15 +40,7 @@ class AuthorAdmin(admin.ModelAdmin):
 admin.site.register(Author, AuthorAdmin)
 
 
-class BooksInstanceInline(admin.TabularInline):
-    """
-    Defines format of inline book instance insertion (used in BookAdmin)
-    """
-    model = BookInstance
-
-
 # Register the Admin classes for Book using the decorator
-
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'display_genre')
@@ -49,17 +48,16 @@ class BookAdmin(admin.ModelAdmin):
 
 
 # Register the Admin classes for BookInstance using the decorator
-
 @admin.register(BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
+    list_display = ('book', 'status', 'borrower', 'due_back', 'id')
     list_filter = ('status', 'due_back')
-    list_display = ['id', 'book', 'imprint', 'status', 'due_back']
 
     fieldsets = (
         (None, {
             'fields': ('book', 'imprint', 'id')
         }),
         ('Availability', {
-            'fields': ('status', 'due_back')
+            'fields': ('status', 'due_back', 'borrower')
         }),
     )

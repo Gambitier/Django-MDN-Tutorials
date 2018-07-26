@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render
 from .models import *
@@ -71,7 +72,6 @@ class AuthorListView(generic.ListView):
 
 
 class BookDetailsView(generic.DetailView):
-
     model = Book
     # ===============================================================================
     # Within the template you can access the model of book with the
@@ -91,3 +91,21 @@ class BookDetailsView(generic.DetailView):
 
 class AuthorDetailsView(generic.DetailView):
     model = Author
+
+
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_borrowed_user.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+
+
+class BorrowedListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    permission_required = 'catalog.can_mark_returned'
+    model = BookInstance
+    template_name = 'catalog/list_of_all_borrowers.html'
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(status__exact='o').order_by('due_back')

@@ -1,5 +1,7 @@
 import uuid
+from datetime import date
 
+from django.contrib.auth.models import User
 from django.db import models
 
 #
@@ -84,8 +86,20 @@ class BookInstance(models.Model):
 
     status = models.CharField(max_length=1, choices=LOAN_STATUS, blank=True, default='m', help_text="Book Availability")
 
+    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    @property
+    def is_overdue(self):
+        if self.due_back and date.today() > self.due_back:
+            return True
+            # We first verify whether due_back is empty before making a comparison. An empty due_back field would
+            # cause Django to throw an error instead of showing the page: empty values are not comparable.
+
+        return False
+
     class Meta:
         ordering = ["due_back"]
+        permissions = (("can_mark_returned", "Set book as returned"),)
 
     def __str__(self):
         return '{0} ({1})'.format(self.id, self.book.title)
