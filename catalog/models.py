@@ -63,7 +63,7 @@ class Book(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('catalog:book-details', args=[self.id])
+        return reverse('catalog:book-details', args=[str(self.id)])
 
 
 class BookInstance(models.Model):
